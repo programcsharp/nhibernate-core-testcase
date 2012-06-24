@@ -86,10 +86,12 @@
   <ItemGroup>
     <Compile Include="DebugConnectionProvider.cs" />
     <Compile Include="NHSpecificTest\BugTestCase.cs" />
-    <Compile Include="NHSpecificTest\NH1234\DomainClass.cs" />
-    <Compile Include="NHSpecificTest\NH1234\SampleTest.cs" />
+    <Compile Include="NHSpecificTest\NH0000\Entity.cs" />
+    <Compile Include="NHSpecificTest\NH0000\Fixture.cs" />
+    <Compile Include="NHSpecificTest\NH0000\FixtureByCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCase.cs" />
+    <Compile Include="TestCaseMappingByCode.cs" />
     <Compile Include="TestConfigurationHelper.cs" />
     <Compile Include="TestDialect.cs" />
   </ItemGroup>
@@ -98,9 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="NHSpecificTest\NH1234\Mappings.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -123,6 +122,7 @@
     <Content Include="hibernate.cfg.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="NHSpecificTest\NH0000\Mappings.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
