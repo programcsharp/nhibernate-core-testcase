@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="NHibernate.Test" namespace="NHibernate.Test.NHSpecificTest.NH0000">
 
-	<class name="Entity">
-		<id name="Id" generator="guid.comb" />
-		<property name="Name" />
-	</class>
-
+  <class name="Entity">
+    <id name="Id" generator="guid.comb" />
+    <property name="Name" />
+    <bag name="SubEntities" table="SubEntity" inverse="true" cascade="all-delete-orphan">
+      <key column="EntityId" />
+      <one-to-many class="SubEntity" />
+      <filter name="bagDeletedFilter" />
+    </bag>
+  </class>
+  
+  <class name="SubEntity">
+    <id name="Id" generator="guid.comb" />
+    <many-to-one name="Entity" column="EntityId" />
+    <property name="Name" />    
+    <property name="DD" />    
+    <filter name="entityDeletedFilter" />
+  </class>
+  <filter-def name="bagDeletedFilter" condition="(DD is null)" />
+  <filter-def name="entityDeletedFilter" condition="(DD is null)" />
 </hibernate-mapping>

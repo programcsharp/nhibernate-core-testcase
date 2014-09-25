@@ -11,7 +11,7 @@ using NHibernate.Mapping;
 using NHibernate.Tool.hbm2ddl;
 using NHibernate.Type;
 using NUnit.Framework;
-using NHibernate.Hql.Classic;
+//using NHibernate.Hql.Classic;
 using NHibernate.Hql.Ast.ANTLR;
 
 namespace NHibernate.Test
@@ -41,7 +41,7 @@ namespace NHibernate.Test
         {
             get
             {
-                return sessions.Settings.QueryTranslatorFactory is ClassicQueryTranslatorFactory;
+                return false;// sessions.Settings.QueryTranslatorFactory is ClassicQueryTranslatorFactory;
             }
         }
 

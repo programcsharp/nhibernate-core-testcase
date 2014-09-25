@@ -1,52 +1,105 @@
-﻿using System.Linq;
-using NHibernate.Linq;
+﻿using NHibernate.Linq;
 using NUnit.Framework;
+using System;
+using System.Linq;
 
 namespace NHibernate.Test.NHSpecificTest.NH0000
 {
-	[TestFixture]
-	public class Fixture : BugTestCase
-	{
-		protected override void OnSetUp()
-		{
-			using (var session = OpenSession())
-			using (var transaction = session.BeginTransaction())
-			{
-				var e1 = new Entity {Name = "Bob"};
-				session.Save(e1);
+    [TestFixture]
+    public class Fixture : BugTestCase
+    {
+        protected override void OnSetUp()
+        {
+            using (var session = OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                var e1 = new Entity { Name = "Bob" };
 
-				var e2 = new Entity {Name = "Sally"};
-				session.Save(e2);
+                e1.SubEntities.Add(new SubEntity() { Entity = e1, Name = "Test1" });
+                e1.SubEntities.Add(new SubEntity() { Entity = e1, Name = "Test2", DD = DateTime.Now });
 
-				session.Flush();
-				transaction.Commit();
-			}
-		}
+                session.Save(e1);
 
-		protected override void OnTearDown()
-		{
-			using (var session = OpenSession())
-			using (var transaction = session.BeginTransaction())
-			{
-				session.Delete("from System.Object");
+                var e2 = new Entity { Name = "Sally" };
+                session.Save(e2);
 
-				session.Flush();
-				transaction.Commit();
-			}
-		}
+                session.Flush();
+                transaction.Commit();
+            }
+        }
 
-		[Test]
-		public void YourTestName()
-		{
-			using (var session = OpenSession())
-			using (session.BeginTransaction())
-			{
-			    var entities = (from e in session.Query<Entity>()
-			                    where e.Name == "Bob"
-			                    select e).ToList();
+        protected override void OnTearDown()
+        {
+            using (var session = OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                session.DisableFilter("entityDeletedFilter");
+                session.DisableFilter("bagDeletedFilter");
 
-			    Assert.AreEqual(1, entities.Count);
-			}
-		}
-	}
+                session.Delete("from System.Object");
+
+                session.Flush();
+                transaction.Commit();
+            }
+        }
+
+        [Test]
+        public void CollectionFilterWorks()
+        {
+            using (var session = OpenSession())
+            using (session.BeginTransaction())
+            {
+                Entity entity = session.Query<Entity>().FirstOrDefault(x => x.Name == "Bob");
+
+                Assert.AreEqual(1, entity.SubEntities.Count);
+            }
+        }
+
+        [Test]
+        public void QueryableFilterWorks()
+        {
+            using (var session = OpenSession())
+            using (session.BeginTransaction())
+            {
+                var subEntities = session.Query<SubEntity>().Where(x => x.Entity.Name == "Bob").ToList();
+
+                Assert.AreEqual(1, subEntities.Count);
+            }
+        }
+
+        [Test]
+        public void QueryableSelectManyFilterWorks()
+        {
+            using (var session = OpenSession())
+            using (session.BeginTransaction())
+            {
+                var subEntities = session.Query<Entity>().Where(x => x.Name == "Bob").SelectMany(x => x.SubEntities).ToList();
+
+                Assert.AreEqual(1, subEntities.Count);
+            }
+        }
+
+        [Test]
+        public void QueryOverFilterWorks()
+        {
+            using (var session = OpenSession())
+            using (session.BeginTransaction())
+            {
+                var subEntities = session.QueryOver<SubEntity>().JoinQueryOver(x => x.Entity).Where(x => x.Name == "Bob").List();
+
+                Assert.AreEqual(1, subEntities.Count);
+            }
+        }
+
+        protected override ISession OpenSession()
+        {
+            ISession session = base.OpenSession();
+
+            session.EnableFilter("entityDeletedFilter");
+            session.EnableFilter("bagDeletedFilter");
+
+            return session;
+        }
+
+    }
 }
